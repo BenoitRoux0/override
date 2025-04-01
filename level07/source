@@ -1,0 +1,127 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int store_number(int *buffer);
+int read_number(int *buffer);
+int get_unum(void);
+void clear_stdin(void);
+
+int main(int argc, const char **argv, const char **envp)
+{
+    int buffer[100];
+    int number;
+    char input[20];
+    unsigned int v13;
+
+    number = 0;
+    bzero(input, sizeof(input));
+    bzero(buffer, sizeof(buffer));
+    while (*argv)
+    {
+        memset((void *)*argv, 0, strlen(*argv));
+        ++argv;
+    }
+    while (*envp)
+    {
+        memset((void *)*envp, 0, strlen(*envp));
+        ++envp;
+    }
+    puts(
+        "----------------------------------------------------\n"
+        "  Welcome to wil's crappy number storage service!   \n"
+        "----------------------------------------------------\n"
+        " Commands:                                          \n"
+        "    store - store a number into the data storage    \n"
+        "    read  - read a number from the data storage     \n"
+        "    quit  - exit the program                        \n"
+        "----------------------------------------------------\n"
+        "   wil has reserved some storage :>                 \n"
+        "----------------------------------------------------\n");
+    while (1)
+    {
+        printf("Input command: ");
+        number = 1;
+        fgets(input, 20, stdin);
+        input[strlen(input) - 1] = 0;
+        if (!memcmp(input, "store", 5))
+        {
+            number = store_number(buffer);
+            if (number)
+                printf(" Failed to do %s command\n", input);
+            else
+                printf(" Completed %s command successfully\n", input);
+        }
+        if (!memcmp(input, "read", 4))
+        {
+            number = read_number(buffer);
+            if (number)
+                printf(" Failed to do %s command\n", input);
+            else
+                printf(" Completed %s command successfully\n", input);
+        }
+        if (!memcmp(input, "quit", 4))
+            return 0;
+        bzero(input, sizeof(input));
+    }
+}
+
+int store_number(int *buffer)
+{
+    uint number;
+    uint index;
+    int ret;
+
+    printf(" Number: ");
+    number = get_unum();
+    printf(" Index: ");
+    index = get_unum();
+    if ((index % 3 == 0) || (number >> 24 == 183))
+    {
+        puts(" *** ERROR! ***");
+        puts("   This index is reserved for wil!");
+        puts(" *** ERROR! ***");
+        ret = 1;
+    }
+    else
+    {
+        buffer[index] = number;
+        ret = 0;
+    }
+    return ret;
+}
+
+int read_number(int *buffer)
+{
+    int number;
+
+    printf(" Index: ");
+    number = get_unum();
+    printf(" Number at data[%u] is %u\n", number, buffer[number]);
+    return 0;
+}
+
+int get_unum(void)
+{
+    int local_10[3];
+
+    local_10[0] = 0;
+    fflush(stdout);
+    scanf("%u", local_10);
+    clear_stdin();
+    return local_10[0];
+}
+
+void clear_stdin(void)
+{
+    int current_char;
+
+    do
+    {
+        current_char = getchar();
+        if ((char)current_char == '\n')
+        {
+            return;
+        }
+    } while ((char)current_char != '\xff');
+}

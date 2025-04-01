@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(void)
+{
+    int cmp;
+    size_t len;
+    char password[112];
+    char token[48];
+    char username[100];
+    FILE *token_file;
+
+    bzero(username, sizeof(username));
+    bzero(token, sizeof(token));
+    bzero(password, sizeof(password));
+    token_file = NULL;
+    token_file = fopen("/home/users/level03/.pass", "r");
+    if (!token_file)
+    {
+        fwrite("ERROR: failed to open password file\n", 1, 0x24, stderr);
+        exit(1);
+    }
+    len = fread(token, 1, 41, token_file);
+    if (len != 41)
+    {
+        fwrite("ERROR: failed to read password file\n", 1, 36, stderr);
+        exit(1);
+    }
+    len = strcspn(token, "\n");
+    token[len] = '\0';
+    fclose(token_file);
+    puts("===== [ Secure Access System v1.0 ] =====");
+    puts("/***************************************\\");
+    puts("| You must login to access this system. |");
+    puts("\\**************************************/");
+    printf("--[ Username: ");
+    fgets(username, 100, stdin);
+    len = strcspn(username, "\n");
+    username[len] = '\0';
+    printf("--[ Password: ");
+    fgets(password, 100, stdin);
+    len = strcspn(password, "\n");
+    password[len] = '\0';
+    puts("*****************************************");
+    cmp = strncmp(token, password, 41);
+    if (cmp == 0)
+    {
+        printf("Greetings, %s!\n", username);
+        system("/bin/sh");
+        return 0;
+    }
+    printf(username);
+    puts(" does not have access!");
+    exit(1);
+}
